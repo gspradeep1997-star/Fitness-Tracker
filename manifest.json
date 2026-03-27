@@ -1,0 +1,11 @@
+{
+  "background_color": "#0a0a0d",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Fitness Tracker",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "FitTrack",
+  "start_url": "./",
+  "theme_color": "#c8f55a"
+}
