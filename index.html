@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mamae Fitness FINAL BOSS</title><style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#0a0a0d;
+  color:#fff;
+}
+
+/* Liquid background */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at 20% 20%,rgba(90,245,200,0.12),transparent 40%),
+             radial-gradient(circle at 80% 30%,rgba(200,245,90,0.12),transparent 40%);
+  z-index:-1;
+}
+
+h2{padding:16px;font-weight:700}
+
+.card{
+  margin:12px;
+  padding:16px;
+  border-radius:24px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(25px) saturate(160%);
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  animation:fadeIn .3s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:14px;
+  border:none;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border:none;
+  border-radius:16px;
+  font-weight:700;
+  background:linear-gradient(135deg,#c8f55a,#5af5c8);
+  box-shadow:0 6px 20px rgba(200,245,90,0.4);
+}
+
+.btn:active{transform:scale(0.95)}
+
+img{width:100%;border-radius:14px;margin-top:8px}
+
+.stats{display:flex;justify-content:space-between;margin-top:10px}
+.stat{font-size:14px}
+
+</style></head>
+<body><h2>🔥 Mamae Final Boss Mode</h2><div class="card">
+<h3>Log Entry</h3>
+<input id="weight" placeholder="Weight (kg)">
+<input id="cal" placeholder="Calories">
+<input id="protein" placeholder="Protein">
+<select id="workout">
+<option value="">Rest</option>
+<option>Push</option>
+<option>Pull</option>
+<option>Legs</option>
+</select>
+<button class="btn" onclick="saveLog()">Save Entry</button>
+</div><div class="card">
+<h3>Dashboard 📊</h3>
+<div id="stats"></div>
+<div id="prediction"></div>
+</div><div class="card">
+<h3>AI Coach 🧠</h3>
+<div id="coach"></div>
+</div><div class="card">
+<h3>Upload Photo 📸</h3>
+<input type="file" id="photo">
+<button class="btn" onclick="savePhoto()">Save Photo</button>
+</div><div class="card">
+<h3>Compare Progress</h3>
+<select id="p1"></select>
+<select id="p2"></select>
+<button class="btn" onclick="compare()">Compare</button>
+<div id="compare"></div>
+</div><div class="card">
+<h3>Gallery</h3>
+<div id="gallery"></div>
+</div><script>
+let data=JSON.parse(localStorage.getItem("data"))||{logs:[],photos:[]};
+
+function save(){localStorage.setItem("data",JSON.stringify(data));}
+
+function saveLog(){
+let w=+weight.value;
+let c=+cal.value;
+let p=+protein.value;
+let wo=workout.value;
+
+if(!w&&!c)return alert("enter something bro 😭");
+
+data.logs.push({w,c,p,wo,date:new Date()});
+save();
+update();
+}
+
+function update(){
+let logs=data.logs;
+if(logs.length==0)return;
+
+let avgCal=Math.round(logs.reduce((s,l)=>s+l.c,0)/logs.length);
+let avgProt=Math.round(logs.reduce((s,l)=>s+l.p,0)/logs.length);
+
+stats.innerHTML=`<div class='stats'>
+<div class='stat'>Calories: ${avgCal}</div>
+<div class='stat'>Protein: ${avgProt}</div>
+</div>`;
+
+let deficit=2500-avgCal;
+let weeklyLoss=((deficit*7)/7700).toFixed(2);
+prediction.innerHTML=🔥 ${weeklyLoss} kg/week fat loss;
+
+let last=logs[logs.length-1];
+let msg="";
+
+if(last.c>2300) msg+="Ayo 😳 calories high chill tmrw ";
+else msg+="Clean cut 😤 ";
+
+if(last.p<120) msg+="protein low bro 💀 ";
+else msg+="muscle safe 💪 ";
+
+if(last.wo) msg+=last.wo+" day done 💪";
+else msg+="rest day 😴";
+
+msg+=<br>Consistency: ${getConsistency()}%;
+
+coach.innerHTML=msg;
+
+updateDropdowns();
+renderGallery();
+}
+
+function getConsistency(){
+let logs=data.logs;
+let score=0;
+logs.forEach(l=>{
+if(l.c<2000)score++;
+if(l.p>130)score++;
+if(l.wo)score++;
+});
+return Math.round(score/(logs.length*3)*100);
+}
+
+function savePhoto(){
+let f=photo.files[0];
+if(!f)return;
+let r=new FileReader();
+r.onload=e=>{
+data.photos.push({img:e.target.result,date:new Date().toLocaleDateString()});
+save();update();};
+r.readAsDataURL(f);
+}
+
+function renderGallery(){
+gallery.innerHTML=data.photos.map(p=><img src="${p.img}"><div>${p.date}</div>).join("");
+}
+
+function updateDropdowns(){
+let opts=data.photos.map((p,i)=><option value="${i}">${p.date}</option>).join("");
+p1.innerHTML=opts;
+p2.innerHTML=opts;
+}
+
+function compare(){
+let a=data.photos[p1.value];
+let b=data.photos[p2.value];
+if(!a||!b)return;
+
+compare.innerHTML=`<img src="${a.img}"><img src="${b.img}">
+<div>Yo 😤 visible progress… waist tighter + shape improving keep going 🔥</div>`;
+}
+
+update();
+</script></body>
+</html>
