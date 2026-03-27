@@ -1,11 +1,20 @@
 {
-  "background_color": "#0a0a0d",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "Fitness Tracker",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "FitTrack",
+  "name": "Mamae Fitness",
+  "short_name": "MamaeFit",
   "start_url": "./",
-  "theme_color": "#c8f55a"
+  "display": "standalone",
+  "background_color": "#0a0a0d",
+  "theme_color": "#c8f55a",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
